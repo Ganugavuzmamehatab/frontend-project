@@ -1,0 +1,113 @@
+import React, { useState, useEffect } from 'react';
+import Navbar from '../components/Navbar';
+import TaskCard from '../components/TaskCard';
+import { getTasks, addTask, updateTask, deleteTask } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+
+const Home = () => {
+    const [tasks, setTasks] = useState([]);
+    const [title, setTitle] = useState('');
+    const navigate = useNavigate();
+    const token = localStorage.getItem('token');
+
+    useEffect(() => {
+        if (!token) return navigate('/login');
+        fetchTasks();
+    }, [token, navigate]);
+
+    const fetchTasks = async () => {
+        const res = await getTasks(token);
+        setTasks(res.data);
+    };
+
+    const handleAdd = async e => {
+        e.preventDefault();
+        if (!title) return;
+        const res = await addTask({ title }, token);
+        setTasks([...tasks, res.data]);
+        setTitle('');
+    };
+
+    const handleToggle = async (id, completed) => {
+        const res = await updateTask(id, { completed }, token);
+        setTasks(tasks.map(t => t._id === id ? res.data : t));
+    };
+
+    const handleDelete = async id => {
+        await deleteTask(id, token);
+        setTasks(tasks.filter(t => t._id !== id));
+    };
+
+    return (
+        <div>
+            <Navbar />
+            <form onSubmit={handleAdd}>
+                <input value={title} onChange={e => setTitle(e.target.value)} placeholder="New task" />
+                <button type="submit">Add Task</button>
+            </form>
+            <div className="task-list">
+                {tasks.map(task => (
+                    <TaskCard key={task._id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export default Home;import React, { useState, useEffect } from 'react';
+import Navbar from '../components/Navbar';
+import TaskCard from '../components/TaskCard';
+import { getTasks, addTask, updateTask, deleteTask } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+
+const Home = () => {
+    const [tasks, setTasks] = useState([]);
+    const [title, setTitle] = useState('');
+    const navigate = useNavigate();
+    const token = localStorage.getItem('token');
+
+    useEffect(() => {
+        if (!token) return navigate('/login');
+        fetchTasks();
+    }, [token, navigate]);
+
+    const fetchTasks = async () => {
+        const res = await getTasks(token);
+        setTasks(res.data);
+    };
+
+    const handleAdd = async e => {
+        e.preventDefault();
+        if (!title) return;
+        const res = await addTask({ title }, token);
+        setTasks([...tasks, res.data]);
+        setTitle('');
+    };
+
+    const handleToggle = async (id, completed) => {
+        const res = await updateTask(id, { completed }, token);
+        setTasks(tasks.map(t => t._id === id ? res.data : t));
+    };
+
+    const handleDelete = async id => {
+        await deleteTask(id, token);
+        setTasks(tasks.filter(t => t._id !== id));
+    };
+
+    return (
+        <div>
+            <Navbar />
+            <form onSubmit={handleAdd}>
+                <input value={title} onChange={e => setTitle(e.target.value)} placeholder="New task" />
+                <button type="submit">Add Task</button>
+            </form>
+            <div className="task-list">
+                {tasks.map(task => (
+                    <TaskCard key={task._id} task={task} onToggle={handleToggle} onDelete={handleDelete} />
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export default Home;
